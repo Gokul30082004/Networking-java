@@ -1,0 +1,15 @@
+package networking.one_way_communication;
+
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+public class OnewayClient {
+    public static void main(String arg[]) throws Exception{
+        Socket s=new Socket("localhost",9000);
+        OutputStreamWriter os=new OutputStreamWriter(s.getOutputStream());
+        PrintWriter pr=new PrintWriter(os);
+        pr.println("10 20 30");
+        pr.flush();
+    }
+}
