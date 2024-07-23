@@ -1,0 +1,40 @@
+package Sendingimage;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.Socket;
+
+public class server {
+    public static void main(String[] args) {
+        try {
+            Socket socket = new Socket("localhost", 12345);
+            InputStream inputStream = socket.getInputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                baos.write(buffer, 0, bytesRead);
+            }
+
+            // Convert byte array back to BufferedImage (or save to file if needed)
+            byte[] imageData = baos.toByteArray();
+            ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+            BufferedImage image = ImageIO.read(bais);
+
+            // Display the image (for demonstration)
+            // Example: You could display this image in a JFrame or save it to disk
+            // For saving:
+            ImageIO.write(image, "jpg", new File("received_image.jpg"));
+
+            // Close streams and socket
+            inputStream.close();
+            socket.close();
+
+            System.out.println("Image received from server.");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
