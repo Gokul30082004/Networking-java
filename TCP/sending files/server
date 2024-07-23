@@ -1,0 +1,27 @@
+package Sendingfile;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class server {
+    ServerSocket ss;
+    public server(ServerSocket serversocket){
+        this.ss=serversocket;
+
+    }
+    public void startserver() throws Exception{
+        System.out.println("Server Started");
+        while(!ss.isClosed()){
+            Socket socket=ss.accept();
+            System.out.println("New Client Joined");
+            handlemsg handle=new handlemsg(socket);
+            Thread thread=new Thread(handle);
+            thread.start();
+        }
+    }
+    public static void main(String args[]) throws Exception{
+        ServerSocket serversocket=new ServerSocket(9000);
+        server mainserver=new server(serversocket);
+        mainserver.startserver();
+    }
+}
