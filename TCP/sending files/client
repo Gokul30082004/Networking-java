@@ -1,0 +1,69 @@
+package Sendingfile;
+import javax.xml.crypto.Data;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class client {
+    private Socket socket;
+    private String name;
+    private DataInputStream ip;
+    private DataOutputStream op;
+    String senderreciver;
+    public client(Socket socket,String name , String sr) throws Exception{
+        this.socket=socket;
+        this.name=name;
+        this.senderreciver=sr;
+        ip=new DataInputStream(socket.getInputStream());
+        op=new DataOutputStream(socket.getOutputStream());
+    }
+    public void getmsg(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(socket.isConnected()){
+                    String write= null;
+                    try {
+                        write = ip.readUTF();
+                        System.out.println(write);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }).start();
+    }
+    public void sendmsg() throws Exception{
+        try {
+            op.writeUTF(name);
+            op.flush();
+            op.writeUTF(senderreciver);
+            op.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Scanner scanner=new Scanner(System.in);
+        while(socket.isConnected()){
+            try{
+                if(senderreciver.equals("sender")) {
+                    String msg = scanner.nextLine();
+                    op.writeUTF(msg);
+                    op.flush();
+                }
+            }catch (Exception e){}
+        }
+    }
+    static public void main(String args[]) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Your Name");
+        String name = scanner.nextLine();
+        System.out.println("Sender / Reciver");
+        String sr=scanner.nextLine();
+        Socket s = new Socket("localhost", 9000);
+        client c = new client(s, name,sr);
+        c.getmsg();
+        c.sendmsg();
+    }
+}
