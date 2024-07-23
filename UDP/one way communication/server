@@ -1,0 +1,30 @@
+package networking.one_way_communication;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+public class udpserver {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Server started.");
+            DatagramSocket socket = new DatagramSocket(9000);
+            byte[] receiveData = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            socket.receive(receivePacket);
+            String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
+            System.out.println("Received from client: " + receivedMessage);
+            int data = Integer.parseInt(receivedMessage.trim());
+            int squared = data * data;
+            byte[] sendData = String.valueOf(squared).getBytes();
+            InetAddress clientAddress = receivePacket.getAddress();
+            int clientPort = receivePacket.getPort();
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, clientAddress, clientPort);
+            socket.send(sendPacket);
+            socket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
