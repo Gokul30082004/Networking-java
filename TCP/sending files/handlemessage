@@ -1,0 +1,48 @@
+package Sendingfile;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+import java.util.ArrayList;
+
+public class handlemessage implements Runnable{
+    public static ArrayList<handlemsg> list=new ArrayList<>();
+    Socket socket;
+    DataOutputStream op;
+    DataInputStream ip;
+    String username;
+    String senderreciver;
+    public handlemsg(Socket socket) throws Exception{
+        this.socket=socket;
+        op=new DataOutputStream(this.socket.getOutputStream());
+        ip=new DataInputStream(this.socket.getInputStream());
+        username=ip.readUTF();
+        senderreciver= ip.readUTF();
+        list.add(this);
+        sendgroupmsg("Server :" + username +" is joined");
+        op.writeUTF("you Joined");
+        op.flush();
+    }
+    @Override
+    public void run(){
+        String msgfromclient;
+        while(socket.isConnected()){
+            try {
+                msgfromclient=ip.readUTF();
+                sendgroupmsg(username+" : "+msgfromclient);
+                op.writeUTF("you : "+msgfromclient);
+                op.flush();
+            }catch (Exception e){}
+        }
+    }
+    public void sendgroupmsg(String s) throws Exception{
+        for(handlemsg client:list){//&& client.senderreciver.equals("Reciver")
+            if (!client.username.equals(username) && client.senderreciver.equals("reciver")) {
+                System.out.println(client.senderreciver);
+                client.op.writeUTF(s);
+                client.op.flush();
+            }
+        }
+    }
+
+}
