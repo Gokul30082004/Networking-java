@@ -1,0 +1,19 @@
+package networking.one_way_communication;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Oneway {
+    public static void main(String args[]) throws Exception{
+        System.out.println("server is started");
+        ServerSocket ss=new ServerSocket(9000);
+        Socket s=ss.accept();
+        System.out.println("connected to client");
+            BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream()));
+        System.out.println(br.readLine());
+//        br.close();
+
+    }
+}
