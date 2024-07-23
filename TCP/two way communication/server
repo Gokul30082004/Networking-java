@@ -1,0 +1,64 @@
+package Networkingminiproject;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class sender1 extends Frame implements Runnable,ActionListener {
+    TextField message;
+    TextArea recived;
+    Button send;
+    ServerSocket ss;
+    DataInputStream ip;
+    DataOutputStream op;
+    Thread messagereader;
+    sender1() throws Exception{
+        message=new TextField();
+        recived=new TextArea();
+        send=new Button("Send");
+        send.addActionListener(this);
+        add(message);
+        add(recived);
+        add(send);
+        ss=new ServerSocket(9000);
+        Socket s=ss.accept();
+        ip=new DataInputStream(s.getInputStream());
+        op=new DataOutputStream(s.getOutputStream());
+        messagereader=new Thread(this);
+        messagereader=new Thread(this);
+        messagereader.setDaemon(true);
+        messagereader.start();
+        setSize(500,500);
+        setTitle("Messenger");
+        setLayout(new FlowLayout());
+        setVisible(true);
+    }
+    @Override
+    public void actionPerformed(ActionEvent e){
+        String s=message.getText();
+        recived.append("Sender 1 : "+s+"\n");
+        message.setText("");
+        try {
+            op.writeUTF(s);
+            op.flush();
+        } catch (IOException ex) {}
+    }
+
+    public static void main(String args[]) throws Exception{
+        new sender1();
+    }
+    public void run(){
+        while(true){
+            try{
+                String msg=ip.readUTF();
+                recived.append("Sender 2: "+msg+"\n");
+            }catch (Exception e){}
+        }
+    }
+}
